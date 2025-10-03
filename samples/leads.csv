@@ -1,0 +1,11 @@
+email,whatsapp_number,first_name,last_name,tags,company,city,opted_in
+sara@example.com,+12025550111,Sara,Kamal,"vip;newsletter",Acme,Cairo,true
+leo@example.com,+12025550112,Leo,Nguyen,newsletter,Acme,New York,true
+maya@example.com,+12025550113,Maya,Diaz,,Globex,Madrid,true
+amir@example.com,+20123456789,Amir,Hassan,vip,Globex,Cairo,false
+lina@example.com,,Lina,Chen,newsletter,Innotech,Singapore,true
+kofi@example.com,+233201234567,Kofi,Mensah,promo,Innotech,Accra,true
+jane@example.com,,Jane,Doe,vip,Acme,London,true
+peter@example.com,+441234567890,Peter,Parker,,Daily Bugle,New York,true
+olivia@example.com,+33123456789,Olivia,Martin,newsletter,Acme,Paris,true
+noah@example.com,,Noah,Smith,promo,Acme,Berlin,true

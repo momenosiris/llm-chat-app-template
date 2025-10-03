@@ -1,36 +1,64 @@
 {
-  "name": "llm-chat-app-template",
-  "description": "A simple chat application powered by Cloudflare Workers AI",
+  "name": "lead-automation-platform",
+  "version": "1.0.0",
   "private": true,
-  "cloudflare": {
-    "label": "LLM Chat App",
-    "products": [
-      "Workers",
-      "Workers AI",
-      "AI Gateway"
-    ],
-    "categories": [
-      "ai"
-    ],
-    "docs_url": "https://developers.cloudflare.com/workers-ai/",
-    "icon_urls": [],
-    "preview_image_url": "https://imagedelivery.net/wSMYJvS3Xw-n339CbDyDIA/153a71bf-d89c-4425-e510-0c7488f22500/public",
-    "publish": true
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "format": "prettier --write .",
+    "prepare": "husky install",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "db:seed": "prisma db seed"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^3.3.4",
+    "@prisma/client": "^5.15.0",
+    "@radix-ui/react-dialog": "^1.0.5",
+    "@radix-ui/react-dropdown-menu": "^2.0.6",
+    "@radix-ui/react-label": "^2.0.2",
+    "@radix-ui/react-popover": "^1.0.7",
+    "@radix-ui/react-select": "^2.0.0",
+    "@radix-ui/react-separator": "^1.0.3",
+    "@radix-ui/react-toast": "^1.1.5",
+    "bcryptjs": "^2.4.3",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "csv-parse": "^5.5.0",
+    "date-fns": "^3.6.0",
+    "jsonwebtoken": "^9.0.2",
+    "lucide-react": "^0.336.0",
+    "next": "14.1.4",
+    "next-auth": "^4.24.7",
+    "next-themes": "^0.2.1",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-hook-form": "^7.51.3",
+    "tailwind-merge": "^2.2.1",
+    "tailwindcss-animate": "^1.0.7",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@cloudflare/vitest-pool-workers": "0.8.44",
-    "@cloudflare/workers-types": "^4.20250425.0",
-    "@types/node": "24.0.4",
-    "typescript": "5.8.3",
-    "vitest": "3.2.4",
-    "wrangler": "4.21.x"
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.5",
+    "@types/node": "20.11.30",
+    "@types/react": "18.2.55",
+    "@types/react-dom": "18.2.18",
+    "autoprefixer": "^10.4.17",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "14.1.4",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.2",
+    "postcss": "^8.4.35",
+    "prettier": "^3.2.5",
+    "prisma": "^5.15.0",
+    "tailwindcss": "^3.4.3",
+    "typescript": "5.3.3"
   },
-  "scripts": {
-    "cf-typegen": "wrangler types",
-    "check": "tsc --noEmit && wrangler deploy --dry-run",
-    "deploy": "wrangler deploy",
-    "dev": "wrangler dev",
-    "start": "wrangler dev",
-    "test": "vitest"
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": "eslint --fix",
+    "*.{ts,tsx,js,jsx,json,css,md}": "prettier --write"
   }
 }
