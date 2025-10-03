@@ -1,0 +1,92 @@
+### Login
+POST http://localhost:3000/api/auth/callback/credentials
+Content-Type: application/x-www-form-urlencoded
+
+csrfToken={{csrfToken}}
+email=admin@example.com
+password=password123
+
+### Create Lead
+POST http://localhost:3000/api/leads
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "email": "newlead@example.com",
+  "firstName": "New",
+  "lastName": "Lead",
+  "tags": ["vip"],
+  "optedIn": true,
+  "customFields": {"company": "Acme"}
+}
+
+### Import CSV
+POST http://localhost:3000/api/leads/import
+Content-Type: text/csv
+Authorization: Bearer {{token}}
+
+< ./samples/leads.csv
+
+### Create Template
+POST http://localhost:3000/api/templates
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Promo Email",
+  "channel": "email",
+  "htmlBody": "<p>Hello {{first_name}}</p>",
+  "placeholders": ["{{first_name}}", "{{unsubscribe_url}}"]
+}
+
+### Create Send Job
+POST http://localhost:3000/api/send
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "channel": "email",
+  "templateId": "{{templateId}}",
+  "segmentTags": ["newsletter"],
+  "filters": {"optedInOnly": true},
+  "webhookFlowId": "{{webhookFlowId}}"
+}
+
+### Sample Outbound Payload
+# {
+#   "type": "EMAIL_BLAST",
+#   "client_id": "client-id",
+#   "job_id": "job-id",
+#   "user_id": "user-id",
+#   "webhook_flow": {"id": "flow-id", "name": "Marketing"},
+#   "template": {
+#     "id": "template-id",
+#     "html_body": "<html>...</html>",
+#     "placeholders": ["{{first_name}}"]
+#   },
+#   "targets": [
+#     {
+#       "lead_id": "lead-id",
+#       "email": "name@example.com",
+#       "merge": {
+#         "first_name": "Sara",
+#         "last_name": "Kamal",
+#         "custom_fields": {"company": "Acme"}
+#       }
+#     }
+#   ],
+#   "callback_url": "http://localhost:3000/api/webhooks/callback"
+# }
+
+### Sample Inbound Callback
+POST http://localhost:3000/api/webhooks/callback
+Content-Type: application/json
+X-Signature: sha256=dummy
+
+{
+  "job_id": "job-id",
+  "lead_id": "lead-id",
+  "status": "sent",
+  "provider_message_id": "abc123",
+  "error_message": null
+}

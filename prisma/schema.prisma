@@ -1,0 +1,183 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Client {
+  id         String          @id @default(cuid())
+  name       String          @unique
+  status     ClientStatus    @default(active)
+  hmacSecret String
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+  webhooks   ClientWebhook[]
+  users      User[]
+  sendJobs   SendJob[]
+}
+
+enum ClientStatus {
+  active
+  disabled
+}
+
+model ClientWebhook {
+  id        String       @id @default(cuid())
+  client    Client       @relation(fields: [clientId], references: [id])
+  clientId  String
+  channel   Channel
+  name      String
+  url       String
+  isDefault Boolean      @default(false)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  @@unique([clientId, channel, isDefault], name: "one_default_per_channel", map: "client_channel_default_unique")
+}
+
+enum Channel {
+  email
+  whatsapp
+}
+
+model User {
+  id           String      @id @default(cuid())
+  client       Client?     @relation(fields: [clientId], references: [id])
+  clientId     String?
+  name         String
+  email        String      @unique
+  role         UserRole
+  status       UserStatus  @default(active)
+  passwordHash String
+  createdAt    DateTime    @default(now())
+  lastLoginAt  DateTime?
+  leads        Lead[]
+  templates    Template[]
+  sendJobs     SendJob[]
+  usageMeter   UsageMeter?
+}
+
+enum UserRole {
+  admin
+  user
+}
+
+enum UserStatus {
+  active
+  disabled
+}
+
+model Lead {
+  id             String    @id @default(cuid())
+  owner          User      @relation(fields: [ownerUserId], references: [id])
+  ownerUserId    String
+  email          String?   @db.Citext
+  whatsappNumber String?   @db.Citext
+  firstName      String?
+  lastName       String?
+  tags           String[]  @default([])
+  customFields   Json      @default("{}")
+  optedIn        Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  sendEvents     SendEvent[]
+
+  @@index([ownerUserId])
+  @@index([email])
+  @@index([whatsappNumber])
+  @@index([tags], type: Gin)
+  @@unique([ownerUserId, email], map: "unique_owner_email")
+  @@unique([ownerUserId, whatsappNumber], map: "unique_owner_whatsapp")
+}
+
+model Template {
+  id            String    @id @default(cuid())
+  owner         User      @relation(fields: [ownerUserId], references: [id])
+  ownerUserId   String
+  name          String
+  channel       Channel
+  htmlBody      String?
+  whatsappBody  String?
+  placeholders  String[]  @default([])
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  sendJobs      SendJob[]
+}
+
+model SendJob {
+  id                String      @id @default(cuid())
+  owner             User        @relation(fields: [ownerUserId], references: [id])
+  ownerUserId       String
+  client            Client      @relation(fields: [clientId], references: [id])
+  clientId          String
+  channel           Channel
+  template          Template    @relation(fields: [templateId], references: [id])
+  templateId        String
+  segmentTags       String[]    @default([])
+  filters           Json        @default("{}")
+  webhookFlow       ClientWebhook? @relation(fields: [webhookFlowId], references: [id])
+  webhookFlowId     String?
+  webhookFlowName   String?
+  status            SendJobStatus @default(queued)
+  countsTotalTargets Int        @default(0)
+  countsSent        Int         @default(0)
+  countsFailed      Int         @default(0)
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  events            SendEvent[]
+}
+
+enum SendJobStatus {
+  queued
+  processing
+  completed
+  failed
+  partial_success
+}
+
+model SendEvent {
+  id               String      @id @default(cuid())
+  job              SendJob     @relation(fields: [sendJobId], references: [id])
+  sendJobId        String
+  lead             Lead        @relation(fields: [leadId], references: [id])
+  leadId           String
+  status           SendEventStatus @default(queued)
+  providerMessageId String?
+  errorMessage     String?
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  @@index([sendJobId])
+  @@index([leadId])
+}
+
+enum SendEventStatus {
+  queued
+  sent
+  failed
+}
+
+model SystemConfig {
+  id                Int      @id @default(1)
+  callbackWebhookIn String
+  defaultHmacSecret String
+  rateLimits        Json
+  csvDefaultMapping Json
+  updatedAt         DateTime @updatedAt
+}
+
+model UsageMeter {
+  id               String   @id @default(cuid())
+  user             User     @relation(fields: [userId], references: [id])
+  userId           String   @unique
+  totalLeads       Int      @default(0)
+  totalSendsEmail  Int      @default(0)
+  totalSendsWhatsapp Int    @default(0)
+  totalFailures    Int      @default(0)
+  window30d        Json     @default("{}")
+  window90d        Json     @default("{}")
+  updatedAt        DateTime @updatedAt
+}
